@@ -6,6 +6,7 @@ from ConfigValidator.Config.Models.RunnerContext import RunnerContext
 from ConfigValidator.Config.Models.OperationType import OperationType
 from ProgressManager.Output.OutputProcedure import OutputProcedure as output
 
+import yaml
 from fabric import Connection
 
 from typing import Dict, List, Any, Optional
@@ -73,8 +74,12 @@ class RunnerConfig:
 
         output.console_log("Config.before_experiment() called!")
 
+        with open('fabconfig.yml') as f:
+            fabconfig = yaml.safe_load(f)
+        host = fabconfig['hosts']['raspberrypi']
+
         """Replace the following parameters with your own Raspberry Pi's IP address, username and password"""
-        self.c = Connection('***.***.***.***', user='***', connect_kwargs={'password': '***'})
+        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
         """Test the connection"""
         result = self.c.run('ls -l')
         print(result.stdout)

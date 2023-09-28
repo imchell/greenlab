@@ -3,3 +3,4 @@ tabulate
 dill
 jsonpickle
 fabric
+pyyaml
