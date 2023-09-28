@@ -10,6 +10,8 @@ hosts:
     password: "xxx"
 ```
 
+and run the following command:
+
 ```shell
 python experiment-runner/ examples/hello-world-ssh/RunnerConfig.py
 ```
