@@ -37,7 +37,13 @@ ssh pi@{IP_ADDRESS}
 
 ## Dependencies Installation on Raspberry Pi
 
-### Python 3.9.13
+Check if dependencies are already installed:
+
+```shell
+python3 --version
+```
+
+### Python 3.9.6
 
 ```shell
 sudo apt update
