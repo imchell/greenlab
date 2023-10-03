@@ -34,3 +34,18 @@ Then connect to the Raspberry Pi via SSH
 ```shell
 ssh pi@{IP_ADDRESS}
 ```
+
+## Dependencies Installation on Raspberry Pi
+
+### Python 3.9.13
+
+```shell
+sudo apt update
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+wget https://www.python.org/ftp/python/3.9.6/Python-3.9.6.tgz
+tar -xf Python-3.9.6.tgz
+cd Python-3.9.6
+./configure
+make -j 4
+sudo make altinstall
+```
