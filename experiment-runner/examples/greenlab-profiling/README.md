@@ -8,6 +8,21 @@ hosts:
     hostname: xxx.xxx.xxx.xxx 
     user: xxx
     password: "xxx"
+  codepath: "~/xxx/xxx/codes/"
+```
+
+in which the codepath has the following structure:
+
+```shell
+codes
+├── handwritten
+│   ├── fasta.py
+│   ├── fasta.cpp
+│   ├── ...
+├── gpt
+│   ├── fasta.py
+│   ├── fasta.cpp
+│   ├── ...
 ```
 
 and run the following command **in the folder** `greenlab\experiment-runner`:
