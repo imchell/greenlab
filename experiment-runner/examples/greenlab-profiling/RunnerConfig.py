@@ -56,16 +56,27 @@ class RunnerConfig:
     def create_run_table_model(self) -> RunTableModel:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
-        factor1 = FactorModel("example_factor1", ['example_treatment1', 'example_treatment2', 'example_treatment3'])
-        factor2 = FactorModel("example_factor2", [True, False])
+
+        factor_algo = FactorModel("Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
+        factor_language = FactorModel("Language", ['py'])
+        # TODO: add handwritten factor
+        factor_gpt = FactorModel("GPT", [False])
         self.run_table_model = RunTableModel(
-            factors=[factor1, factor2],
-            exclude_variations=[
-                {factor1: ['example_treatment1']},                   # all runs having treatment "example_treatment1" will be excluded
-                {factor1: ['example_treatment2'], factor2: [True]},  # all runs having the combination ("example_treatment2", True) will be excluded
-            ],
+            factors=[factor_algo, factor_language, factor_gpt],
             data_columns=['avg_cpu', 'avg_mem']
         )
+        
+        # factor1 = FactorModel("example_factor1", ['example_treatment1', 'example_treatment2', 'example_treatment3'])
+        # factor2 = FactorModel("example_factor2", [True, False])
+        # self.run_table_model = RunTableModel(
+        #     factors=[factor1, factor2],
+        #     exclude_variations=[
+        #         {factor1: ['example_treatment1']},                   # all runs having treatment "example_treatment1" will be excluded
+        #         {factor1: ['example_treatment2'], factor2: [True]},  # all runs having the combination ("example_treatment2", True) will be excluded
+        #     ],
+        #     data_columns=['avg_cpu', 'avg_mem']
+        # )
+        
         return self.run_table_model
 
     def before_experiment(self) -> None:
@@ -75,8 +86,8 @@ class RunnerConfig:
         output.console_log("Config.before_experiment() called!")
 
         with open('fabconfig.yml') as f:
-            fabconfig = yaml.safe_load(f)
-        host = fabconfig['hosts']['raspberrypi']
+            self.fabconfig = yaml.safe_load(f)
+        host = self.fabconfig['hosts']['raspberrypi']
 
         """Replace the following parameters with your own Raspberry Pi's IP address, username and password"""
         self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
@@ -96,6 +107,17 @@ class RunnerConfig:
         Activities after starting the run should also be performed here."""
 
         output.console_log("Config.start_run() called!")
+
+        algo = context.run_variation['Algorithm']
+        lang = context.run_variation['Language']
+        gpt = context.run_variation['GPT']
+
+        if gpt:
+            print(f"Running {algo} in {lang} with GPT generated code")
+        else:
+            print(f"Running {algo} in {lang} with handwritten code")
+            if lang == 'py':
+                self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
