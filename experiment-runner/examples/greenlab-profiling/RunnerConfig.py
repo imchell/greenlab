@@ -13,6 +13,8 @@ from typing import Dict, List, Any, Optional
 from pathlib import Path
 from os.path import dirname, realpath
 
+import psutil
+
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -52,6 +54,7 @@ class RunnerConfig:
         self.run_table_model = None  # Initialized later
         self.fabconfig = None
         self.c = None
+        self.pid = None
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
@@ -122,11 +125,21 @@ class RunnerConfig:
             print(f"Running {algo} in {lang} with handwritten code")
             if lang == 'py':
                 if algo == 'fasta':
-                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
+                    # self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
+                    result = self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py > /dev/null 2>&1 & echo $!', hide=True)
+                    self.pid = int(result.stdout.strip())
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
         output.console_log("Config.start_measurement() called!")
+
+        # Measure the resource usage of the process
+        # TODO: Note that not all executions have a valid pid
+        process = psutil.Process(self.pid)
+        cpu_percent = process.cpu_percent(interval=1)
+        memory_info = process.memory_info()
+        print(f"CPU usage: {cpu_percent}%")
+        print(f"Memory usage: {memory_info.rss / (1024 * 1024)} MB")
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
