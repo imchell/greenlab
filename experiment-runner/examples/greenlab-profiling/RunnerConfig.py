@@ -50,14 +50,15 @@ class RunnerConfig:
             (RunnerEvents.AFTER_EXPERIMENT , self.after_experiment )
         ])
         self.run_table_model = None  # Initialized later
-
+        self.fabconfig = None
+        self.c = None
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
 
-        factor_algo = FactorModel("Algorithm", ['helloworld'])
+        factor_algo = FactorModel("Algorithm", ['helloworld', 'fasta'])
                                   # ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         factor_language = FactorModel("Language", ['py'])
         # TODO: add handwritten factor
@@ -86,15 +87,9 @@ class RunnerConfig:
 
         output.console_log("Config.before_experiment() called!")
 
+        # Load the connection configuration
         with open('fabconfig.yml') as f:
             self.fabconfig = yaml.safe_load(f)
-        host = self.fabconfig['hosts']['raspberrypi']
-
-        """Replace the following parameters with your own Raspberry Pi's IP address, username and password"""
-        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
-        """Test the connection"""
-        result = self.c.run('ls -l')
-        print(result.stdout)
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
@@ -109,6 +104,14 @@ class RunnerConfig:
 
         output.console_log("Config.start_run() called!")
 
+        host = self.fabconfig['hosts']['raspberrypi']
+
+        # Replace the following parameters with your own Raspberry Pi's IP address, username and password
+        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        # Test the connection
+        result = self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py')
+        print(result.stdout)
+
         algo = context.run_variation['Algorithm']
         lang = context.run_variation['Language']
         gpt = context.run_variation['GPT']
@@ -118,7 +121,8 @@ class RunnerConfig:
         else:
             print(f"Running {algo} in {lang} with handwritten code")
             if lang == 'py':
-                self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
+                if algo == 'fasta':
+                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
@@ -146,6 +150,9 @@ class RunnerConfig:
         Returns a dictionary with keys `self.run_table_model.data_columns` and their values populated"""
 
         output.console_log("Config.populate_run_data() called!")
+
+        # Close the connection
+        self.c.close()
         return None
 
     def after_experiment(self) -> None:
@@ -153,8 +160,6 @@ class RunnerConfig:
         Invoked only once during the lifetime of the program."""
 
         output.console_log("Config.after_experiment() called!")
-        """Close the connection"""
-        self.c.close()
 
     # ================================ DO NOT ALTER BELOW THIS LINE ================================
     experiment_path:            Path             = None
