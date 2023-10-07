@@ -57,7 +57,7 @@ class RunnerConfig:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
 
-        factor_algo = FactorModel("Algorithm", ['helloword'])
+        factor_algo = FactorModel("Algorithm", ['helloworld'])
                                   # ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         factor_language = FactorModel("Language", ['py'])
         # TODO: add handwritten factor
