@@ -14,7 +14,8 @@ from pathlib import Path
 from os.path import dirname, realpath
 
 import psutil
-
+import time
+import pandas as pd
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -54,6 +55,7 @@ class RunnerConfig:
         self.run_table_model = None  # Initialized later
         self.fabconfig = None
         self.c = None
+        self.t = None
         self.pid = None
         output.console_log("Custom config loaded")
 
@@ -125,21 +127,23 @@ class RunnerConfig:
             print(f"Running {algo} in {lang} with handwritten code")
             if lang == 'py':
                 if algo == 'fasta':
-                    # self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 25000000')
-                    result = self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py > /dev/null 2>&1 & echo $!', hide=True)
-                    self.pid = int(result.stdout.strip())
+                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 250000', hide=True)
+                if algo == 'helloworld':
+                    self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
         output.console_log("Config.start_measurement() called!")
 
-        # Measure the resource usage of the process
-        # TODO: Note that not all executions have a valid pid
-        process = psutil.Process(self.pid)
-        cpu_percent = process.cpu_percent(interval=1)
-        memory_info = process.memory_info()
-        print(f"CPU usage: {cpu_percent}%")
-        print(f"Memory usage: {memory_info.rss / (1024 * 1024)} MB")
+        host = self.fabconfig['hosts']['raspberrypi']
+
+        # Replace the following parameters with your own Raspberry Pi's IP address, username and password
+        self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        # Measure the CPU usage on the Raspberry Pi
+        cpu_usage_command = 'top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\''
+        result = self.t.run(cpu_usage_command, hide=True)
+        cpu_usage = float(result.stdout.strip())
+        print(f"CPU usage: {cpu_usage}%")
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
@@ -150,6 +154,7 @@ class RunnerConfig:
         """Perform any activity here required for stopping measurements."""
 
         output.console_log("Config.stop_measurement called!")
+        self.t.close()
 
     def stop_run(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping the run.
