@@ -60,7 +60,7 @@ class RunnerConfig:
         self.pid = None
         self.cpu_usage = None
         self.stop_measurement_thread = False
-        self.stop_thread = False
+        self.stop_run_thread = False
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
@@ -119,7 +119,7 @@ class RunnerConfig:
                 if algo == 'fasta':
                     #TODO: change input size
                     def run_thread():
-                        if not self.stop_thread:
+                        if not self.stop_run_thread:
                             self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000', hide=True)
 
                     self.thread = threading.Thread(target=run_thread)
@@ -127,7 +127,7 @@ class RunnerConfig:
 
                 if algo == 'helloworld':
                     def run_thread():
-                        if not self.stop_thread:
+                        if not self.stop_run_thread:
                             self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
 
                     self.thread = threading.Thread(target=run_thread)
@@ -176,7 +176,7 @@ class RunnerConfig:
         output.console_log("Config.stop_run() called!")
 
         # Stop the thread that gets the CPU usage
-        self.stop_thread = True
+        self.stop_run_thread = True
         self.thread.join()
 
         # Close the fabric connection
