@@ -131,7 +131,7 @@ class RunnerConfig:
                 if algo == 'helloworld':
                     def run_thread():
                         if not self.stop_run_thread:
-                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
+                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py', hide=True)
 
                     self.c_thread = threading.Thread(target=run_thread)
                     self.c_thread.start()
@@ -164,7 +164,6 @@ class RunnerConfig:
         output.console_log("Config.stop_measurement called!")
         self.stop_measurement_thread = True
         self.t_thread.join()
-        self.t.close()
         self.cpu_usage = None
 
     def stop_run(self, context: RunnerContext) -> None:
@@ -177,9 +176,6 @@ class RunnerConfig:
         self.stop_run_thread = True
         self.c_thread.join()
 
-        # Close the fabric connection
-        self.c.close()
-
     def populate_run_data(self, context: RunnerContext) -> Optional[Dict[str, Any]]:
         """Parse and process any measurement data here.
         You can also store the raw measurement data under `context.run_dir`
@@ -187,8 +183,6 @@ class RunnerConfig:
 
         output.console_log("Config.populate_run_data() called!")
 
-        # Close the connection
-        self.c.close()
         return None
 
     def after_experiment(self) -> None:
@@ -196,6 +190,9 @@ class RunnerConfig:
         Invoked only once during the lifetime of the program."""
 
         output.console_log("Config.after_experiment() called!")
+
+        self.c.close()
+        self.t.close()
 
     # ================================ DO NOT ALTER BELOW THIS LINE ================================
     experiment_path:            Path             = None
