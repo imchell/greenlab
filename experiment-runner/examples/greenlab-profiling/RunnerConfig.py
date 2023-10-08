@@ -59,7 +59,7 @@ class RunnerConfig:
         self.t = None
         self.pid = None
         self.cpu_usage = None
-        self.stop_thread = False
+        self.stop_measurement_thread = False
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
@@ -147,7 +147,7 @@ class RunnerConfig:
         profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
 
         def profiler_thread():
-            while not self.stop_thread:
+            while not self.stop_measurement_thread:
                 result = self.t.run(profiler_cmd, hide=True)
                 self.cpu_usage = float(result.stdout.strip())
                 print(f'CPU Usage: {self.cpu_usage}%')
@@ -166,7 +166,7 @@ class RunnerConfig:
         """Perform any activity here required for stopping measurements."""
 
         output.console_log("Config.stop_measurement called!")
-        self.stop_thread = True
+        self.stop_measurement_thread = True
         self.thread.join()
         self.t.close()
         self.cpu_usage = None
