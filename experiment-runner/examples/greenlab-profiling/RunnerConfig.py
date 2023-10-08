@@ -118,19 +118,20 @@ class RunnerConfig:
         else:
             print(f"Running {algo} in {lang} with handwritten code")
             if lang == 'py':
+                if algo == 'helloworld':
+                    # for test purpose
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py', hide=True)
+
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
+
                 if algo == 'fasta':
                     #TODO: change input size
                     def run_thread():
                         if not self.stop_run_thread:
                             self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000000', hide=True)
-
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
-
-                if algo == 'helloworld':
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py', hide=True)
 
                     self.c_thread = threading.Thread(target=run_thread)
                     self.c_thread.start()
