@@ -60,6 +60,7 @@ class RunnerConfig:
         self.pid = None
         self.cpu_usage = None
         self.stop_measurement_thread = False
+        self.stop_thread = False
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
@@ -131,9 +132,20 @@ class RunnerConfig:
             if lang == 'py':
                 if algo == 'fasta':
                     #TODO: change input size
-                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 2500000', hide=True)
+                    def run_thread():
+                        if not self.stop_thread:
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000', hide=True)
+
+                    self.thread = threading.Thread(target=run_thread)
+                    self.thread.start()
+
                 if algo == 'helloworld':
-                    self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
+                    def run_thread():
+                        if not self.stop_thread:
+                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
+
+                    self.thread = threading.Thread(target=run_thread)
+                    self.thread.start()
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
@@ -176,6 +188,13 @@ class RunnerConfig:
         Activities after stopping the run should also be performed here."""
 
         output.console_log("Config.stop_run() called!")
+
+        # Stop the thread that gets the CPU usage
+        self.stop_thread = True
+        self.thread.join()
+
+        # Close the fabric connection
+        self.c.close()
 
     def populate_run_data(self, context: RunnerContext) -> Optional[Dict[str, Any]]:
         """Parse and process any measurement data here.
