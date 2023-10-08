@@ -16,6 +16,7 @@ from os.path import dirname, realpath
 import psutil
 import time
 import pandas as pd
+import threading
 
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
@@ -57,6 +58,8 @@ class RunnerConfig:
         self.c = None
         self.t = None
         self.pid = None
+        self.cpu_usage = None
+        self.stop_thread = False
         output.console_log("Custom config loaded")
 
     def create_run_table_model(self) -> RunTableModel:
@@ -140,11 +143,19 @@ class RunnerConfig:
 
         # Replace the following parameters with your own Raspberry Pi's IP address, username and password
         self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
-        # Measure the CPU usage on the Raspberry Pi
-        cpu_usage_command = 'top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\''
-        result = self.t.run(cpu_usage_command, hide=True)
-        cpu_usage = float(result.stdout.strip())
-        print(f"CPU usage: {cpu_usage}%")
+        
+        profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
+
+        def profiler_thread():
+            while not self.stop_thread:
+                result = self.t.run(profiler_cmd, hide=True)
+                self.cpu_usage = float(result.stdout.strip())
+                print(f'CPU Usage: {self.cpu_usage}%')
+                time.sleep(1)
+
+        self.thread = threading.Thread(target=profiler_thread)
+        self.thread.start()
+
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
@@ -155,7 +166,10 @@ class RunnerConfig:
         """Perform any activity here required for stopping measurements."""
 
         output.console_log("Config.stop_measurement called!")
+        self.stop_thread = True
+        self.thread.join()
         self.t.close()
+        self.cpu_usage = None
 
     def stop_run(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping the run.
