@@ -67,8 +67,7 @@ class RunnerConfig:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
 
-        factor_algo = FactorModel("Algorithm", ['helloworld', 'fasta'])
-                                  # ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
+        factor_algo = FactorModel("Algorithm", ['helloworld', 'fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         factor_language = FactorModel("Language", ['py'])
         # TODO: add handwritten factor
         factor_gpt = FactorModel("GPT", [False])
@@ -132,6 +131,38 @@ class RunnerConfig:
                     def run_thread():
                         if not self.stop_run_thread:
                             self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py', hide=True)
+
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
+
+                if algo == 'knucleotide':
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
+
+                if algo == 'pidigits':
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 10000', hide=True)
+
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
+
+                if algo == 'regexredux':
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
+
+                if algo == 'revcomp':
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                     self.c_thread = threading.Thread(target=run_thread)
                     self.c_thread.start()

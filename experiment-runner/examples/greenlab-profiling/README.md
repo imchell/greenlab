@@ -37,6 +37,14 @@ The necessary dependencies and their corresponding installation derivatives are 
   sudo apt-get install sysstat
   ```
 
+* `gmpy2` which is used in `pidigits.py`
+
+  ```shell
+  sudo apt-get install libmpfr-dev
+  sudo apt-get install libgmp-dev libmpc-dev
+  pip install gmpy2
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
