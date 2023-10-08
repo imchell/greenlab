@@ -89,6 +89,14 @@ class RunnerConfig:
         with open('fabconfig.yml') as f:
             self.fabconfig = yaml.safe_load(f)
 
+        host = self.fabconfig['hosts']['raspberrypi']
+
+        # Replace the following parameters with your own Raspberry Pi's IP address, username and password
+        # For start_run() and stop_run()
+        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        # For start_measurement() and stop_measurement()
+        self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
         No context is available here as the run is not yet active (BEFORE RUN)"""
@@ -101,11 +109,6 @@ class RunnerConfig:
         Activities after starting the run should also be performed here."""
 
         output.console_log("Config.start_run() called!")
-
-        host = self.fabconfig['hosts']['raspberrypi']
-
-        # Replace the following parameters with your own Raspberry Pi's IP address, username and password
-        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
 
         algo = context.run_variation['Algorithm']
         lang = context.run_variation['Language']
@@ -122,25 +125,20 @@ class RunnerConfig:
                         if not self.stop_run_thread:
                             self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000', hide=True)
 
-                    self.thread = threading.Thread(target=run_thread)
-                    self.thread.start()
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
 
                 if algo == 'helloworld':
                     def run_thread():
                         if not self.stop_run_thread:
                             self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
 
-                    self.thread = threading.Thread(target=run_thread)
-                    self.thread.start()
+                    self.c_thread = threading.Thread(target=run_thread)
+                    self.c_thread.start()
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
-        output.console_log("Config.start_measurement() called!")
-
-        host = self.fabconfig['hosts']['raspberrypi']
-
-        # Replace the following parameters with your own Raspberry Pi's IP address, username and password
-        self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        output.console_log("Config.start_measurement() called!")     
         
         profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
 
@@ -151,8 +149,8 @@ class RunnerConfig:
                 print(f'CPU Usage: {self.cpu_usage}%')
                 time.sleep(1)
 
-        self.thread = threading.Thread(target=profiler_thread)
-        self.thread.start()
+        self.t_thread = threading.Thread(target=profiler_thread)
+        self.t_thread.start()
 
 
     def interact(self, context: RunnerContext) -> None:
@@ -165,7 +163,7 @@ class RunnerConfig:
 
         output.console_log("Config.stop_measurement called!")
         self.stop_measurement_thread = True
-        self.thread.join()
+        self.t_thread.join()
         self.t.close()
         self.cpu_usage = None
 
@@ -177,7 +175,7 @@ class RunnerConfig:
 
         # Stop the thread that gets the CPU usage
         self.stop_run_thread = True
-        self.thread.join()
+        self.c_thread.join()
 
         # Close the fabric connection
         self.c.close()
