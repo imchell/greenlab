@@ -139,14 +139,17 @@ class RunnerConfig:
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
         output.console_log("Config.start_measurement() called!")     
-        
+
         profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
+
+        self.cpu_usage_data = []  # Create a list to store CPU usage data
 
         def profiler_thread():
             while not self.stop_measurement_thread:
                 result = self.t.run(profiler_cmd, hide=True)
-                self.cpu_usage = float(result.stdout.strip())
-                print(f'CPU Usage: {self.cpu_usage}%')
+                cpu_usage = float(result.stdout.strip())
+                self.cpu_usage_data.append(cpu_usage)  # Store CPU usage data
+                print(f'CPU Usage: {cpu_usage}%')
                 time.sleep(1)
 
         self.t_thread = threading.Thread(target=profiler_thread)
@@ -183,9 +186,14 @@ class RunnerConfig:
         You can also store the raw measurement data under `context.run_dir`
         Returns a dictionary with keys `self.run_table_model.data_columns` and their values populated"""
 
-        output.console_log("Config.populate_run_data() called!")
+        df = pd.DataFrame(self.cpu_usage_data, columns=['cpu_usage'])  # Use the cpu_usage_data list
 
-        return None
+        df.to_csv(context.run_dir / 'raw_data.csv', index=False)
+
+        run_data = {
+            'avg_cpu': round(df['cpu_usage'].mean(), 3)
+        }
+        return run_data
 
     def after_experiment(self) -> None:
         """Perform any activity required after stopping the experiment here
