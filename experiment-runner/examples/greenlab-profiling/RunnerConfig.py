@@ -73,7 +73,7 @@ class RunnerConfig:
         factor_gpt = FactorModel("GPT", [False])
         self.run_table_model = RunTableModel(
             factors=[factor_algo, factor_language, factor_gpt],
-            data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io']
+            data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io', 'run_time']
         )
         
         return self.run_table_model
@@ -177,6 +177,7 @@ class RunnerConfig:
         disk_io_profiler_cmd = "iostat -dx | awk 'NR==4 {print $14}'"
 
         self.system_usage_data = []  # Create a list to store system usage data
+        self.start_time = time.time()  # Record the start time
 
         def profiler_thread():
             while not self.stop_measurement_thread:
@@ -192,6 +193,8 @@ class RunnerConfig:
 
                 print(f'CPU Usage: {cpu_usage}%, Memory Usage: {mem_usage}%, Disk I/O: {disk_io}')
                 time.sleep(1)
+
+            self.end_time = time.time()  # Record the end time
 
         self.t_thread = threading.Thread(target=profiler_thread)
         self.t_thread.start()
@@ -231,10 +234,13 @@ class RunnerConfig:
 
         df.to_csv(context.run_dir / 'raw_data.csv', index=False)
 
+        run_time = self.end_time - self.start_time  # Calculate the run time
+
         run_data = {
             'avg_cpu': round(df['cpu_usage'].mean(), 3),
             'avg_mem': round(df['mem_usage'].mean(), 3),
-            'avg_disk_io': round(df['disk_io'].mean(), 3)
+            'avg_disk_io': round(df['disk_io'].mean(), 3),
+            'run_time': run_time
         }
         return run_data
 
