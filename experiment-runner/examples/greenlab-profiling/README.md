@@ -45,6 +45,13 @@ The necessary dependencies and their corresponding installation derivatives are 
   pip install gmpy2
   ```
 
+  If it's not working, try the following:
+
+  ```shell
+  sudo pip3 install gmpy
+  sudo pip3 install gmpy2
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:

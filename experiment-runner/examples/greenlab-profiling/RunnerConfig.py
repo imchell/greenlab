@@ -73,7 +73,7 @@ class RunnerConfig:
         factor_gpt = FactorModel("GPT", [False])
         self.run_table_model = RunTableModel(
             factors=[factor_algo, factor_language, factor_gpt],
-            data_columns=['avg_cpu', 'avg_mem']
+            data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io']
         )
         
         return self.run_table_model
@@ -147,7 +147,7 @@ class RunnerConfig:
                 if algo == 'pidigits':
                     def run_thread():
                         if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 10000', hide=True)
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 100', hide=True)
 
                     self.c_thread = threading.Thread(target=run_thread)
                     self.c_thread.start()
