@@ -123,7 +123,7 @@ class RunnerConfig:
                     #TODO: change input size
                     def run_thread():
                         if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000', hide=True)
+                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000000', hide=True)
 
                     self.c_thread = threading.Thread(target=run_thread)
                     self.c_thread.start()
@@ -162,9 +162,6 @@ class RunnerConfig:
         """Perform any activity here required for stopping measurements."""
 
         output.console_log("Config.stop_measurement called!")
-        self.stop_measurement_thread = True
-        self.t_thread.join()
-        self.cpu_usage = None
 
     def stop_run(self, context: RunnerContext) -> None:
         """Perform any activity here required for stopping the run.
@@ -175,6 +172,11 @@ class RunnerConfig:
         # Stop the thread that gets the CPU usage
         self.stop_run_thread = True
         self.c_thread.join()
+        # The reason we need to stop the measurement thread here is because the experiment runner
+        # will call stop_measurement(), which can be stop as soon as possible, before stop_run(), which lasts for a while
+        self.stop_measurement_thread = True
+        self.t_thread.join()
+        self.cpu_usage = None
 
     def populate_run_data(self, context: RunnerContext) -> Optional[Dict[str, Any]]:
         """Parse and process any measurement data here.
