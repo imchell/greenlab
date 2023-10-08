@@ -173,7 +173,7 @@ class RunnerConfig:
         self.stop_run_thread = True
         self.c_thread.join()
         # The reason we need to stop the measurement thread here is because the experiment runner
-        # will call stop_measurement(), which can be stop as soon as possible, before stop_run(), which lasts for a while
+        # will call stop_measurement(), which can be stopped as soon as possible, before stop_run(), which lasts for a while
         self.stop_measurement_thread = True
         self.t_thread.join()
         self.cpu_usage = None
