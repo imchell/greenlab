@@ -29,6 +29,14 @@ codes
 
 ## Dependencies
 
+The necessary dependencies and their corresponding installation derivatives are listed below:
+
+* `sysstat` for Disk I/O monitoring
+
+  ```shell
+  sudo apt-get install sysstat
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
