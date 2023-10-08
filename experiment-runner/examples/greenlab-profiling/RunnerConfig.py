@@ -140,16 +140,25 @@ class RunnerConfig:
         """Perform any activity required for starting measurements."""
         output.console_log("Config.start_measurement() called!")     
 
-        profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
+        cpu_profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
+        mem_profiler_cmd = "free | grep Mem | awk '{print $3/$2 * 100.0}'"
+        disk_io_profiler_cmd = "iostat -dx | awk 'NR==4 {print $14}'"
 
-        self.cpu_usage_data = []  # Create a list to store CPU usage data
+        self.system_usage_data = []  # Create a list to store system usage data
 
         def profiler_thread():
             while not self.stop_measurement_thread:
-                result = self.t.run(profiler_cmd, hide=True)
-                cpu_usage = float(result.stdout.strip())
-                self.cpu_usage_data.append(cpu_usage)  # Store CPU usage data
-                print(f'CPU Usage: {cpu_usage}%')
+                cpu_result = self.t.run(cpu_profiler_cmd, hide=True)
+                mem_result = self.t.run(mem_profiler_cmd, hide=True)
+                disk_io_result = self.t.run(disk_io_profiler_cmd, hide=True)
+
+                cpu_usage = float(cpu_result.stdout.strip())
+                mem_usage = float(mem_result.stdout.strip())
+                disk_io = float(disk_io_result.stdout.strip())
+
+                self.system_usage_data.append([cpu_usage, mem_usage, disk_io])  # Store system usage data
+
+                print(f'CPU Usage: {cpu_usage}%, Memory Usage: {mem_usage}%, Disk I/O: {disk_io}')
                 time.sleep(1)
 
         self.t_thread = threading.Thread(target=profiler_thread)
@@ -186,12 +195,14 @@ class RunnerConfig:
         You can also store the raw measurement data under `context.run_dir`
         Returns a dictionary with keys `self.run_table_model.data_columns` and their values populated"""
 
-        df = pd.DataFrame(self.cpu_usage_data, columns=['cpu_usage'])  # Use the cpu_usage_data list
+        df = pd.DataFrame(self.system_usage_data, columns=['cpu_usage', 'mem_usage', 'disk_io'])  # Use the system_usage_data list
 
         df.to_csv(context.run_dir / 'raw_data.csv', index=False)
 
         run_data = {
-            'avg_cpu': round(df['cpu_usage'].mean(), 3)
+            'avg_cpu': round(df['cpu_usage'].mean(), 3),
+            'avg_mem': round(df['mem_usage'].mean(), 3),
+            'avg_disk_io': round(df['disk_io'].mean(), 3)
         }
         return run_data
 

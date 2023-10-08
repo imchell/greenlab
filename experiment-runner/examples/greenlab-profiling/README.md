@@ -1,5 +1,7 @@
 # GreenLab Profiling
 
+## Configurations
+
 Please add a file named `fabconfig.yaml` to `experiment-runner` folder with the following content:
 
 ```yaml
@@ -25,7 +27,11 @@ codes
 │   ├── ...
 ```
 
-and run the following command **in the folder** `greenlab\experiment-runner`:
+## Dependencies
+
+## Run
+
+Run the following command **in the folder** `greenlab\experiment-runner`:
 
 ```shell
 python experiment-runner/ examples/greenlab-profiling/RunnerConfig.py
