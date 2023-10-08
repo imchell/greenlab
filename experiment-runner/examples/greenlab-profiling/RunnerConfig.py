@@ -127,7 +127,8 @@ class RunnerConfig:
             print(f"Running {algo} in {lang} with handwritten code")
             if lang == 'py':
                 if algo == 'fasta':
-                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 250000', hide=True)
+                    #TODO: change input size
+                    self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 2500000', hide=True)
                 if algo == 'helloworld':
                     self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/helloworld.py', hide=True)
 
