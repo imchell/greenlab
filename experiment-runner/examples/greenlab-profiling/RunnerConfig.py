@@ -67,11 +67,11 @@ class RunnerConfig:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
 
-        factor_algo = FactorModel("Algorithm", ['helloworld', 'fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
+        factor_algo = FactorModel("Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         # TODO: add other languages
         factor_language = FactorModel("Language", ['py'])
         # TODO: add handwritten factor
-        factor_gpt = FactorModel("GPT", [False])
+        factor_gpt = FactorModel("GPT", [False, True])
         # TODO: enable repetitions in formal experiments
         factor_repetitions = FactorModel("Repetitions", list(range(1, 31)))
         
@@ -117,60 +117,65 @@ class RunnerConfig:
         lang = context.run_variation['Language']
         gpt = context.run_variation['GPT']
 
+        gpt_path = "handwritten"
+
         if gpt:
             print(f"Running {algo} in {lang} with GPT generated code")
+            gpt_path = "gpt"
         else:
             print(f"Running {algo} in {lang} with handwritten code")
-            if lang == 'py':
-                if algo == 'helloworld':
-                    # for test purpose
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py', hide=True)
+            gpt_path = "handwritten"
+        
+        if lang == 'py':
+            if algo == 'helloworld':
+                # for test purpose
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
-                if algo == 'fasta':
-                    #TODO: change input size
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 1000000', hide=True)
+            if algo == 'fasta':
+                #TODO: change input size
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 1000000', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
-                if algo == 'knucleotide':
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+            if algo == 'knucleotide':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
-                if algo == 'pidigits':
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py 100', hide=True)
+            if algo == 'pidigits':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 100', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
-                if algo == 'regexredux':
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+            if algo == 'regexredux':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
-                if algo == 'revcomp':
-                    def run_thread():
-                        if not self.stop_run_thread:
-                            self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}handwritten/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+            if algo == 'revcomp':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
-                    self.c_thread = threading.Thread(target=run_thread)
-                    self.c_thread.start()
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
