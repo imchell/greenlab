@@ -69,7 +69,7 @@ class RunnerConfig:
 
         factor_algo = FactorModel("Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         # TODO: add other languages
-        factor_language = FactorModel("Language", ['py'])
+        factor_language = FactorModel("Language", ['py', 'js'])
         factor_gpt = FactorModel("GPT", [False, True])
         # TODO: enable repetitions in formal experiments
         factor_repetitions = FactorModel("Repetitions", list(range(1, 31)))
@@ -172,6 +172,15 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+        if lang == 'js':
+            if algo == 'fasta':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js 1000000', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()

@@ -52,6 +52,12 @@ The necessary dependencies and their corresponding installation derivatives are 
   sudo pip3 install gmpy2
   ```
 
+* `Node.js` for JavaScript execution
+
+  ```shell
+  sudo apt-get install nodejs
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
