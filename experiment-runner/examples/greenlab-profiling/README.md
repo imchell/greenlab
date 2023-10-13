@@ -58,6 +58,18 @@ The necessary dependencies and their corresponding installation derivatives are 
   sudo apt-get install nodejs
   ```
 
+* `npm` for Node.js package management
+
+  ```shell
+  sudo apt-get install npm
+  ```
+
+* `big-integer` for JavaScript big integer support
+
+  ```shell
+  npm install big-integer
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
