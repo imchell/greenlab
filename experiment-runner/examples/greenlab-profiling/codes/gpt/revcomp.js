@@ -1,8 +1,8 @@
 const readline = require('readline');
 
-// Helper function to calculate the reverse complement of a DNA sequence
+// Function to calculate the reverse complement of a DNA sequence
 function reverseComplement(sequence) {
-  const complementMap = {
+  const complementTable = {
     A: 'T',
     C: 'G',
     G: 'C',
@@ -17,10 +17,14 @@ function reverseComplement(sequence) {
     H: 'D',
     D: 'H',
     B: 'V',
-    N: 'N',
+    N: 'N'
   };
 
-  return sequence.split('').reverse().map(base => complementMap[base] || base).join('');
+  return sequence
+    .split('')
+    .reverse()
+    .map(base => complementTable[base] || base)
+    .join('');
 }
 
 const rl = readline.createInterface({
@@ -31,31 +35,31 @@ const rl = readline.createInterface({
 
 let currentSequence = null;
 
-rl.on('line', (line) => {
+rl.on('line', line => {
   if (line.startsWith('>')) {
-    // Output the previous sequence's reverse complement (if exists)
     if (currentSequence) {
       const reverseComp = reverseComplement(currentSequence);
-      console.log(`${currentSequence.id} ${currentSequence.description}\n${reverseComp}`);
+      console.log(`${currentSequenceId} ${currentSequenceDesc}`);
+      console.log(reverseComp);
     }
 
-    // Parse sequence ID and description
-    const [id, description] = line.substring(1).split(' ');
-    currentSequence = {
-      id,
-      description,
-      sequence: '',
-    };
+    // Extract ID and description from the header line
+    const [, id, desc] = line.match(/^>(\S+)\s*(.*)/);
+
+    // Initialize a new sequence
+    currentSequenceId = id;
+    currentSequenceDesc = desc;
+    currentSequence = '';
   } else {
-    // Concatenate the sequence
-    currentSequence.sequence += line.trim();
+    // Append the sequence line
+    currentSequence += line.trim();
   }
 });
 
 rl.on('close', () => {
-  // Output the reverse complement for the last sequence
   if (currentSequence) {
-    const reverseComp = reverseComplement(currentSequence.sequence);
-    console.log(`${currentSequence.id} ${currentSequence.description}\n${reverseComp}`);
+    const reverseComp = reverseComplement(currentSequence);
+    console.log(`${currentSequenceId} ${currentSequenceDesc}`);
+    console.log(reverseComp);
   }
 });

@@ -70,7 +70,7 @@ class RunnerConfig:
         factor_algo = FactorModel("Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         # TODO: add other languages
         factor_language = FactorModel("Language", ['py', 'js'])
-        factor_gpt = FactorModel("GPT", [False])
+        factor_gpt = FactorModel("GPT", [False, True])
         # TODO: enable repetitions in formal experiments
         factor_repetitions = FactorModel("Repetitions", list(range(1, 31)))
         

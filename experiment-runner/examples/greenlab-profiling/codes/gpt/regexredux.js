@@ -1,49 +1,58 @@
 const fs = require('fs');
+const readline = require('readline');
 
-function processInput(input) {
-  const patterns = [
-    /agggtaaa|tttaccct/g,
-    /[cgt]gggtaaa|tttaccc[acg]/g,
-    /a[act]ggtaaa|tttacc[agt]t/g,
-    /ag[act]gtaaa|tttac[agt]ct/g,
-    /agg[act]taaa|ttta[agt]cct/g,
-    /aggg[acg]aaa|ttt[cgt]ccct/g,
-    /agggt[cgt]aa|tt[acg]accct/g,
-    /agggta[cgt]a|t[acg]taccct/g,
-    /agggtaa[cgt]|[acg]ttaccct/g
-  ];
+const sequences = [
+  'agggtaaa|tttaccct',
+  '[cgt]gggtaaa|tttaccc[acg]',
+  'a[act]ggtaaa|tttacc[agt]t',
+  'ag[act]gtaaa|tttac[agt]ct',
+  'agg[act]taaa|ttta[agt]cct',
+  'aggg[acg]aaa|ttt[cgt]ccct',
+  'agggt[cgt]aa|tt[acg]accct',
+  'agggta[cgt]a|t[acg]taccct',
+  'agggtaa[cgt]|[acg]ttaccct',
+];
 
-  const magicPatterns = [
-    /tHa[Nt]/g,
-    /aND|caN|Ha[DS]|WaS/g,
-    /a[NSt]|BY/g,
-    /<[^>]*>/g,
-    /\|[^|][^|]*\|/g
-  ];
+const magicSequences = [
+  { pattern: 'tHa[Nt]', replace: '<4>' },
+  { pattern: 'aND|caN|Ha[DS]|WaS', replace: '<3>' },
+  { pattern: 'a[NSt]|BY', replace: '<2>' },
+  { pattern: '<[^>]*>', replace: '|' },
+  { pattern: '\\|[^|][^|]*\\|', replace: '-' },
+];
 
-  let sequenceLengths = Array(patterns.length).fill(0);
-  let sequence = input;
+let sequence = '';
+let sequenceLengths = [];
 
-  for (let i = 0; i < patterns.length; i++) {
-    const pattern = patterns[i];
-    const matches = sequence.match(pattern);
-    if (matches) {
-      sequenceLengths[i] = matches.length;
-    }
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false,
+});
+
+rl.on('line', (line) => {
+  if (!line.startsWith('>')) {
+    sequence += line;
   }
+});
 
-  for (let i = 0; i < magicPatterns.length; i++) {
-    sequence = sequence.replace(magicPatterns[i], `<${i + 2}>`);
-  }
+rl.on('close', () => {
+  sequenceLengths.push(sequence.length);
 
-  const sequenceLengthString = sequenceLengths.join('\n');
-  const output = sequenceLengths
-    .map((count, index) => `${patterns[index].source} ${count}`)
-    .join('\n') + '\n\n' + sequenceLengthString;
+  sequences.forEach((seq) => {
+    const regex = new RegExp(seq, 'g');
+    const matches = sequence.match(regex);
+    console.log(`${seq} ${matches ? matches.length : 0}`);
+  });
 
-  return output;
-}
+  magicSequences.forEach(({ pattern, replace }) => {
+    sequence = sequence.replace(new RegExp(pattern, 'g'), replace);
+  });
 
-const input = fs.readFileSync('input.txt', 'utf-8');
-const output = processInput(input);
-console.log(output);
+  sequenceLengths.push(sequence.length);
+
+  sequence = sequence.replace(/[^BDEFHIJKLMNOPQRSUVWXYZ]/g, '');
+  sequenceLengths.push(sequence.length);
+
+  console.log(sequenceLengths.join('\n'));
+});
