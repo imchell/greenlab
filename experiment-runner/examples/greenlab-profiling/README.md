@@ -70,6 +70,20 @@ The necessary dependencies and their corresponding installation derivatives are 
   npm install big-integer
   ```
 
+* `Java` for Java compilation and execution
+
+  ```shell
+  sudo apt update
+  sudo apt install openjdk-11-jdk
+  java -version
+  ```
+
+* `gcc` for C/C++ compilation
+
+  ```shell
+  sudo apt install build-essential
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
