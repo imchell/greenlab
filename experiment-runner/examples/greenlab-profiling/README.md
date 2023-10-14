@@ -78,10 +78,13 @@ The necessary dependencies and their corresponding installation derivatives are 
   java -version
   ```
 
-* `gcc` for C/C++ compilation
+* `gcc` for C/C++ compilation and related libraries
 
   ```shell
-  sudo apt install build-essential
+  sudo apt-get update
+  sudo apt-get install g++
+  sudo apt-get install libpthread-stubs0-dev
+  sudo apt-get install build-essential
   ```
 
 ## Run
