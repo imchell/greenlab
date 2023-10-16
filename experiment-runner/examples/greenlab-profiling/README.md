@@ -91,14 +91,14 @@ The necessary dependencies and their corresponding installation derivatives are 
 
   ```shell
   g++ -std=c++20 -O3 -o fasta fasta.cpp -lpthread
-  g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++14 knucleotide.cpp -o knucleotide
-  g++ knucleotide -o knucleotide_run -Wl,--no-as-needed -lpthread
+  g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++14 knucleotide.cpp -o knucleotide.o
+  g++ knucleotide.o -o knucleotide -Wl,--no-as-needed -lpthread
   g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++14 -g pidigits.cpp -o pidigits.o
-  g++ pidigits.o -o pidigits_run -lgmp -lgmpxx
+  g++ pidigits.o -o pidigits -lgmp -lgmpxx
   sudo apt-get install g++ libpcre++-dev
   sudo apt-get install libpcre3-dev
   g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++17 -fopenmp -flto regexredux.cpp -o regexredux.o
-  g++ regexredux.o -o regexredux_run -fopenmp -lpcre
+  g++ regexredux.o -o regexredux -fopenmp -lpcre
   g++ revcomp.cpp -o revcomp -lpthread -O3
   ```
 
