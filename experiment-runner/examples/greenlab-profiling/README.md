@@ -105,11 +105,11 @@ The necessary dependencies and their corresponding installation derivatives are 
 - Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the C/C++ codes:
 
   ```shell
-  g++ fasta.cpp -o fasta_gpt
-  g++ knucleotide.cpp -o knucleotide_gpt -O3
-  g++ pidigits.cpp -o pidigits_gpt -O3 -lmpfr -lgmp
-  g++ regexredux.cpp -o regexredux_gpt -O3 -std=c++11
-  g++ revcomp.cpp -o revcomp_gpt -O3
+  g++ fasta.cpp -o fasta
+  g++ knucleotide.cpp -o knucleotide -O3
+  g++ pidigits.cpp -o pidigits -O3 -lmpfr -lgmp
+  g++ regexredux.cpp -o regexredux -O3 -std=c++11
+  g++ revcomp.cpp -o revcomp -O3
   ```
 
 ## Run
