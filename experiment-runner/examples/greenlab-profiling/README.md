@@ -7,7 +7,7 @@ Please add a file named `fabconfig.yaml` to `experiment-runner` folder with the 
 ```yaml
 hosts:
   raspberrypi:
-    hostname: xxx.xxx.xxx.xxx 
+    hostname: xxx.xxx.xxx.xxx
     user: xxx
     password: "xxx"
   codepath: "~/xxx/xxx/codes/"
@@ -31,13 +31,13 @@ codes
 
 The necessary dependencies and their corresponding installation derivatives are listed below:
 
-* `sysstat` for Disk I/O monitoring
+- `sysstat` for Disk I/O monitoring
 
   ```shell
   sudo apt-get install sysstat
   ```
 
-* `gmpy2` which is used in `pidigits.py`
+- `gmpy2` which is used in `pidigits.py`
 
   ```shell
   sudo apt-get install libmpfr-dev
@@ -52,25 +52,25 @@ The necessary dependencies and their corresponding installation derivatives are 
   sudo pip3 install gmpy2
   ```
 
-* `Node.js` for JavaScript execution
+- `Node.js` for JavaScript execution
 
   ```shell
   sudo apt-get install nodejs
   ```
 
-* `npm` for Node.js package management
+- `npm` for Node.js package management
 
   ```shell
   sudo apt-get install npm
   ```
 
-* `big-integer` for JavaScript big integer support
+- `big-integer` for JavaScript big integer support
 
   ```shell
   npm install big-integer
   ```
 
-* `Java` for Java compilation and execution
+- `Java` for Java compilation and execution
 
   ```shell
   sudo apt update
@@ -78,13 +78,38 @@ The necessary dependencies and their corresponding installation derivatives are 
   java -version
   ```
 
-* `gcc` for C/C++ compilation and related libraries
+- `gcc` for C/C++ compilation and related libraries
 
   ```shell
   sudo apt-get update
   sudo apt-get install g++
   sudo apt-get install libpthread-stubs0-dev
   sudo apt-get install build-essential
+  ```
+
+- Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the C/C++ codes:
+
+  ```shell
+  g++ -std=c++20 -O3 -o fasta fasta.cpp -lpthread
+  g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++14 knucleotide.cpp -o knucleotide
+  g++ knucleotide -o knucleotide_run -Wl,--no-as-needed -lpthread
+  g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++14 -g pidigits.cpp -o pidigits.o
+  g++ pidigits.o -o pidigits_run -lgmp -lgmpxx
+  sudo apt-get install g++ libpcre++-dev
+  sudo apt-get install libpcre3-dev
+  g++ -c -pipe -O3 -fomit-frame-pointer -march=native -std=c++17 -fopenmp -flto regexredux.cpp -o regexredux.o
+  g++ regexredux.o -o regexredux_run -fopenmp -lpcre
+  g++ revcomp.cpp -o revcomp -lpthread -O3
+  ```
+
+- Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the C/C++ codes:
+
+  ```shell
+  g++ fasta.cpp -o fasta_gpt
+  g++ knucleotide.cpp -o knucleotide_gpt -O3
+  g++ pidigits.cpp -o pidigits_gpt -O3 -lmpfr -lgmp
+  g++ regexredux_gpt.cpp -o regexredux_gpt -O3 -std=c++11
+  g++ revcomp.cpp -o revcomp_gpt -O3
   ```
 
 ## Run
