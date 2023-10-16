@@ -237,7 +237,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 1000000', hide=True)
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 1000000', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -246,7 +246,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -255,7 +255,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 100', hide=True)
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 100', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -264,7 +264,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -273,7 +273,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
