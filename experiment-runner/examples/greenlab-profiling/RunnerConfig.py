@@ -18,24 +18,25 @@ import time
 import pandas as pd
 import threading
 
+
 class RunnerConfig:
     ROOT_DIR = Path(dirname(realpath(__file__)))
 
     # ================================ USER SPECIFIC CONFIG ================================
     """The name of the experiment."""
-    name:                       str             = "new_runner_experiment"
+    name:                       str = "new_runner_experiment"
 
     """The path in which Experiment Runner will create a folder with the name `self.name`, in order to store the
     results from this experiment. (Path does not need to exist - it will be created if necessary.)
     Output path defaults to the config file's path, inside the folder 'experiments'"""
-    results_output_path:        Path             = ROOT_DIR / 'experiments'
+    results_output_path:        Path = ROOT_DIR / 'experiments'
 
     """Experiment operation type. Unless you manually want to initiate each run, use `OperationType.AUTO`."""
-    operation_type:             OperationType   = OperationType.AUTO
+    operation_type:             OperationType = OperationType.AUTO
 
     """The time Experiment Runner will wait after a run completes.
     This can be essential to accommodate for cooldown periods on some systems."""
-    time_between_runs_in_ms:    int             = 1000
+    time_between_runs_in_ms:    int = 1000
 
     # Dynamic configurations can be one-time satisfied here before the program takes the config as-is
     # e.g. Setting some variable based on some criteria
@@ -44,14 +45,14 @@ class RunnerConfig:
 
         EventSubscriptionController.subscribe_to_multiple_events([
             (RunnerEvents.BEFORE_EXPERIMENT, self.before_experiment),
-            (RunnerEvents.BEFORE_RUN       , self.before_run       ),
-            (RunnerEvents.START_RUN        , self.start_run        ),
+            (RunnerEvents.BEFORE_RUN, self.before_run),
+            (RunnerEvents.START_RUN, self.start_run),
             (RunnerEvents.START_MEASUREMENT, self.start_measurement),
-            (RunnerEvents.INTERACT         , self.interact         ),
-            (RunnerEvents.STOP_MEASUREMENT , self.stop_measurement ),
-            (RunnerEvents.STOP_RUN         , self.stop_run         ),
+            (RunnerEvents.INTERACT, self.interact),
+            (RunnerEvents.STOP_MEASUREMENT, self.stop_measurement),
+            (RunnerEvents.STOP_RUN, self.stop_run),
             (RunnerEvents.POPULATE_RUN_DATA, self.populate_run_data),
-            (RunnerEvents.AFTER_EXPERIMENT , self.after_experiment )
+            (RunnerEvents.AFTER_EXPERIMENT, self.after_experiment)
         ])
         self.run_table_model = None  # Initialized later
         self.fabconfig = None
@@ -67,18 +68,19 @@ class RunnerConfig:
         """Create and return the run_table model here. A run_table is a List (rows) of tuples (columns),
         representing each run performed"""
 
-        factor_algo = FactorModel("Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
+        factor_algo = FactorModel(
+            "Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
         # TODO: add other languages
-        factor_language = FactorModel("Language", ['py', 'js'])
+        factor_language = FactorModel("Language", ['py', 'js', 'cpp'])
         factor_gpt = FactorModel("GPT", [False, True])
         # TODO: enable repetitions in formal experiments
         factor_repetitions = FactorModel("Repetitions", list(range(1, 31)))
-        
+
         self.run_table_model = RunTableModel(
             factors=[factor_algo, factor_language, factor_gpt],
             data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io', 'run_time']
         )
-        
+
         return self.run_table_model
 
     def before_experiment(self) -> None:
@@ -95,9 +97,11 @@ class RunnerConfig:
 
         # Replace the following parameters with your own Raspberry Pi's IP address, username and password
         # For start_run() and stop_run()
-        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        self.c = Connection(host['hostname'], user=host['user'], connect_kwargs={
+                            'password': host['password']})
         # For start_measurement() and stop_measurement()
-        self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={'password': host['password']})
+        self.t = Connection(host['hostname'], user=host['user'], connect_kwargs={
+                            'password': host['password']})
 
     def before_run(self) -> None:
         """Perform any activity required before starting a run.
@@ -124,22 +128,24 @@ class RunnerConfig:
         else:
             print(f"Running {algo} in {lang} with handwritten code")
             gpt_path = "handwritten"
-        
+
         if lang == 'py':
             if algo == 'helloworld':
                 # for test purpose
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py', hide=True)
+                        self.c.run(
+                            f'nohup python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
 
             if algo == 'fasta':
-                #TODO: change input size
+                # TODO: change input size
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 1000000', hide=True)
+                        self.c.run(
+                            f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 1000000', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -147,7 +153,8 @@ class RunnerConfig:
             if algo == 'knucleotide':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -155,7 +162,8 @@ class RunnerConfig:
             if algo == 'pidigits':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 100', hide=True)
+                        self.c.run(
+                            f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py 100', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -163,7 +171,8 @@ class RunnerConfig:
             if algo == 'regexredux':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -171,7 +180,8 @@ class RunnerConfig:
             if algo == 'revcomp':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'python -OO {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.py < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -180,7 +190,8 @@ class RunnerConfig:
             if algo == 'fasta':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js 1000000', hide=True)
+                        self.c.run(
+                            f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js 1000000', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -188,7 +199,8 @@ class RunnerConfig:
             if algo == 'knucleotide':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -196,7 +208,8 @@ class RunnerConfig:
             if algo == 'pidigits':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js 100', hide=True)
+                        self.c.run(
+                            f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js 100', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -204,7 +217,8 @@ class RunnerConfig:
             if algo == 'regexredux':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -212,14 +226,61 @@ class RunnerConfig:
             if algo == 'revcomp':
                 def run_thread():
                     if not self.stop_run_thread:
-                        self.c.run(f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                        self.c.run(
+                            f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+        if lang == 'cpp':
+            if algo == 'fasta':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 1000000', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'knucleotide':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'pidigits':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 100', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'regexredux':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'revcomp':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'./{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
 
     def start_measurement(self, context: RunnerContext) -> None:
         """Perform any activity required for starting measurements."""
-        output.console_log("Config.start_measurement() called!")     
+        output.console_log("Config.start_measurement() called!")
 
         cpu_profiler_cmd = "top -b -n1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"
         mem_profiler_cmd = "free | grep Mem | awk '{print $3/$2 * 100.0}'"
@@ -238,16 +299,17 @@ class RunnerConfig:
                 mem_usage = float(mem_result.stdout.strip())
                 disk_io = float(disk_io_result.stdout.strip())
 
-                self.system_usage_data.append([cpu_usage, mem_usage, disk_io])  # Store system usage data
+                self.system_usage_data.append(
+                    [cpu_usage, mem_usage, disk_io])  # Store system usage data
 
-                print(f'CPU Usage: {cpu_usage}%, Memory Usage: {mem_usage}%, Disk I/O: {disk_io}')
+                print(
+                    f'CPU Usage: {cpu_usage}%, Memory Usage: {mem_usage}%, Disk I/O: {disk_io}')
                 time.sleep(1)
 
             self.end_time = time.time()  # Record the end time
 
         self.t_thread = threading.Thread(target=profiler_thread)
         self.t_thread.start()
-
 
     def interact(self, context: RunnerContext) -> None:
         """Perform any interaction with the running target system here, or block here until the target finishes."""
@@ -279,7 +341,8 @@ class RunnerConfig:
         You can also store the raw measurement data under `context.run_dir`
         Returns a dictionary with keys `self.run_table_model.data_columns` and their values populated"""
 
-        df = pd.DataFrame(self.system_usage_data, columns=['cpu_usage', 'mem_usage', 'disk_io'])  # Use the system_usage_data list
+        df = pd.DataFrame(self.system_usage_data, columns=[
+                          'cpu_usage', 'mem_usage', 'disk_io'])  # Use the system_usage_data list
 
         df.to_csv(context.run_dir / 'raw_data.csv', index=False)
 
@@ -303,4 +366,4 @@ class RunnerConfig:
         self.t.close()
 
     # ================================ DO NOT ALTER BELOW THIS LINE ================================
-    experiment_path:            Path             = None
+    experiment_path:            Path = None
