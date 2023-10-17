@@ -78,7 +78,13 @@ class RunnerConfig:
 
         self.run_table_model = RunTableModel(
             factors=[factor_algo, factor_language, factor_gpt],
-            data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io', 'run_time']
+            data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io', 'run_time'],
+            exclude_variations=[
+                {factor_algo: ['spectralnorm', 'binarytrees'], factor_language: [
+                    'cpp', 'js', 'python'], factor_gpt: [True, False]},
+                {factor_algo: ['pidigits', 'knucleotide'], factor_language: [
+                    'java'], factor_gpt: [True, False]},
+            ]
         )
 
         return self.run_table_model
@@ -186,6 +192,24 @@ class RunnerConfig:
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
 
+            if algo == 'spectralnorm':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'binarytrees':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
         if lang == 'js':
             if algo == 'fasta':
                 def run_thread():
@@ -228,6 +252,24 @@ class RunnerConfig:
                     if not self.stop_run_thread:
                         self.c.run(
                             f'node {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.js < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'spectralnorm':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'binarytrees':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -278,12 +320,30 @@ class RunnerConfig:
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
 
+            if algo == 'spectralnorm':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'binarytrees':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
         if lang == 'java':
             if algo == 'binarytrees':
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 21', hide=True)
+                            f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} 21', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -292,7 +352,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 5000', hide=True)
+                            f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} 5000', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -302,12 +362,12 @@ class RunnerConfig:
                     def run_thread():
                         if not self.stop_run_thread:
                             self.c.run(
-                                f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} {self.fabconfig["hosts"]["codepath"]}{gpt_path}/regexredux-input.txt', hide=True)
+                                f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} {self.fabconfig["hosts"]["codepath"]}{gpt_path}/regexredux-input.txt', hide=True)
                 else:
                     def run_thread():
                         if not self.stop_run_thread:
                             self.c.run(
-                                f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 0 < {self.fabconfig["hosts"]["codepath"]}{gpt_path}/regexredux-input.txt', hide=True)
+                                f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} 0 < {self.fabconfig["hosts"]["codepath"]}{gpt_path}/regexredux-input.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -316,7 +376,7 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} {self.fabconfig["hosts"]["codepath"]}{gpt_path}/revcomp-input.txt {self.fabconfig["hosts"]["codepath"]}{gpt_path}/output.txt', hide=True)
+                            f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} {self.fabconfig["hosts"]["codepath"]}{gpt_path}/revcomp-input.txt {self.fabconfig["hosts"]["codepath"]}{gpt_path}/output.txt', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
@@ -325,7 +385,25 @@ class RunnerConfig:
                 def run_thread():
                     if not self.stop_run_thread:
                         self.c.run(
-                            f'java {self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo} 100', hide=True)
+                            f'java -cp {self.fabconfig["hosts"]["codepath"]}{gpt_path}/ {algo} 100', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'pidigits':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'knucleotide':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
