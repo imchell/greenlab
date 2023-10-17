@@ -15,3 +15,5 @@ python
 fabconfig.yml
 examples/greenlab-profiling/codes/handwritten/*.class
 examples/greenlab-profiling/codes/gpt/*.class
+examples/greenlab-profiling/codes/handwritten/*.compiled
+examples/greenlab-profiling/codes/gpt/*.compiled
