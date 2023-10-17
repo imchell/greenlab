@@ -69,7 +69,7 @@ class RunnerConfig:
         representing each run performed"""
 
         factor_algo = FactorModel(
-            "Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp'])
+            "Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp', 'spectralnorm', 'binarytrees'])
         # TODO: add other languages
         factor_language = FactorModel("Language", ['py', 'js', 'cpp'])
         factor_gpt = FactorModel("GPT", [False, True])

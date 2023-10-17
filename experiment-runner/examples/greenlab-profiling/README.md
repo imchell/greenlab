@@ -112,6 +112,26 @@ The necessary dependencies and their corresponding installation derivatives on R
   g++ revcomp.cpp -o revcomp -O3
   ```
 
+  - Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the Java codes:
+
+  ```shell
+  javac binarytrees.java
+  javac fasta.java
+  javac regexredux.java
+  javac spectralnorm.java
+  javac revcomp.java
+  ```
+
+  - Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the Java codes:
+
+  ```shell
+  javac binarytrees.java
+  javac fasta.java
+  javac regexredux.java
+  javac spectralnorm.java
+  javac revcomp.java
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:

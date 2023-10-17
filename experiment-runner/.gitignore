@@ -13,3 +13,5 @@ _trial_temp/
 pycharm-interpreter.sh
 python
 fabconfig.yml
+examples/greenlab-profiling/codes/handwritten/*.class
+examples/greenlab-profiling/codes/gpt/*.class
