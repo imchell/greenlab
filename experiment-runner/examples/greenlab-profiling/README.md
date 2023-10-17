@@ -29,7 +29,7 @@ codes
 
 ## Dependencies
 
-The necessary dependencies and their corresponding installation derivatives are listed below:
+The necessary dependencies and their corresponding installation derivatives on Raspberry Pi are listed below:
 
 - `sysstat` for Disk I/O monitoring
 
