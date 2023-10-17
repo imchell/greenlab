@@ -132,6 +132,16 @@ The necessary dependencies and their corresponding installation derivatives on R
   javac revcomp.java
   ```
 
+  - Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the C codes:
+
+  ```shell
+  gcc fasta.c -o fasta.compiled
+  gcc knucleotide.c -o knucleotidec.compiled
+  gcc pidigits.c -o pidigits.compiled -lgmp -lm
+  gcc nbody.c -o nbody.compiled
+  gcc spectralnorm.c -o spectralnorm.compiled
+  ```
+
 ## Run
 
 Run the following command **in the folder** `greenlab\experiment-runner`:
