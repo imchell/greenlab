@@ -136,7 +136,7 @@ The necessary dependencies and their corresponding installation derivatives on R
 
   ```shell
   gcc fasta.c -o fasta.compiled
-  gcc knucleotide.c -o knucleotidec.compiled
+  gcc knucleotide.c -o knucleotide.compiled
   gcc pidigits.c -o pidigits.compiled -lgmp -lm
   gcc -pipe -Wall -O3 -fomit-frame-pointer nbody.c -o nbody.compiled -lm
   gcc -pipe -Wall -O3 -fomit-frame-pointer -fopenmp spectralnorm.c -o spectralnorm.compiled -lm
@@ -146,7 +146,7 @@ The necessary dependencies and their corresponding installation derivatives on R
 
   ```shell
   gcc fasta.c -o fasta.compiled
-  gcc knucleotide.c -o knucleotidec.compiled
+  gcc knucleotide.c -o knucleotide.compiled
   gcc pidigits.c -o pidigits.compiled -lgmp -lm
   gcc -pipe -Wall -O3 -fomit-frame-pointer nbody.c -o nbody.compiled -lm
   gcc -pipe -Wall -O3 -fomit-frame-pointer -fopenmp spectralnorm.c -o spectralnorm.compiled -lm

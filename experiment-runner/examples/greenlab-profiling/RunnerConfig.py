@@ -69,9 +69,10 @@ class RunnerConfig:
         representing each run performed"""
 
         factor_algo = FactorModel(
-            "Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp', 'spectralnorm', 'binarytrees'])
+            "Algorithm", ['fasta', 'knucleotide', 'pidigits', 'regexredux', 'revcomp', 'spectralnorm', 'binarytrees', 'nbody'])
         # TODO: add other languages
-        factor_language = FactorModel("Language", ['py', 'js', 'cpp', 'java'])
+        factor_language = FactorModel(
+            "Language", ['py', 'js', 'cpp', 'java', 'c'])
         factor_gpt = FactorModel("GPT", [False, True])
         # TODO: enable repetitions in formal experiments
         factor_repetitions = FactorModel("Repetitions", list(range(1, 31)))
@@ -80,10 +81,12 @@ class RunnerConfig:
             factors=[factor_algo, factor_language, factor_gpt],
             data_columns=['avg_cpu', 'avg_mem', 'avg_disk_io', 'run_time'],
             exclude_variations=[
-                {factor_algo: ['spectralnorm', 'binarytrees'], factor_language: [
+                {factor_algo: ['spectralnorm', 'binarytrees', 'nbody'], factor_language: [
                     'cpp', 'js', 'python'], factor_gpt: [True, False]},
-                {factor_algo: ['pidigits', 'knucleotide'], factor_language: [
+                {factor_algo: ['pidigits', 'knucleotide', 'nbody'], factor_language: [
                     'java'], factor_gpt: [True, False]},
+                {factor_algo: ['regexredux', 'revcomp', 'binarytrees'], factor_language: [
+                    'c'], factor_gpt: [True, False]}
             ]
         )
 
@@ -404,6 +407,58 @@ class RunnerConfig:
                     if not self.stop_run_thread:
                         self.c.run(
                             f'', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+        if lang == 'c':
+            if algo == 'fasta':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled 5000', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'knucleotide':
+                if gpt:
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(
+                                f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+                else:
+                    def run_thread():
+                        if not self.stop_run_thread:
+                            self.c.run(
+                                f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled 0 < {self.fabconfig["hosts"]["codepath"]}handwritten/input1000.txt', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'nbody':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled 50000000', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'pidigits':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled 100', hide=True)
+
+                self.c_thread = threading.Thread(target=run_thread)
+                self.c_thread.start()
+
+            if algo == 'spectralnorm':
+                def run_thread():
+                    if not self.stop_run_thread:
+                        self.c.run(
+                            f'{self.fabconfig["hosts"]["codepath"]}{gpt_path}/{algo}.compiled 5500', hide=True)
 
                 self.c_thread = threading.Thread(target=run_thread)
                 self.c_thread.start()
