@@ -112,7 +112,7 @@ The necessary dependencies and their corresponding installation derivatives on R
   g++ revcomp.cpp -o revcomp -O3
   ```
 
-  - Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the Java codes:
+- Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the Java codes:
 
   ```shell
   javac binarytrees.java
@@ -122,7 +122,7 @@ The necessary dependencies and their corresponding installation derivatives on R
   javac revcomp.java
   ```
 
-  - Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the Java codes:
+- Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the Java codes:
 
   ```shell
   javac binarytrees.java
@@ -132,7 +132,7 @@ The necessary dependencies and their corresponding installation derivatives on R
   javac revcomp.java
   ```
 
-  - Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the C codes:
+- Enter the `~/xxx/xxx/codes/handwritten` folder and run the following command to compile the C codes:
 
   ```shell
   gcc fasta.c -o fasta.compiled
@@ -142,7 +142,7 @@ The necessary dependencies and their corresponding installation derivatives on R
   gcc -pipe -Wall -O3 -fomit-frame-pointer -fopenmp spectralnorm.c -o spectralnorm.compiled -lm
   ```
 
-  - Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the C codes:
+- Enter the `~/xxx/xxx/codes/gpt` folder and run the following command to compile the C codes:
 
   ```shell
   gcc fasta.c -o fasta.compiled
