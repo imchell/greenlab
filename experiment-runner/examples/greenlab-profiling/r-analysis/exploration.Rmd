@@ -1,0 +1,234 @@
+---
+title: "Data Exploration For GreenLab"
+date: "2023-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read Data
+
+```{r cars}
+data <- read.csv("~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/merged_result.csv")
+
+```
+
+## Dispersion - example
+
+Extract SD, CV, mean, Range from the data.
+
+```{r pressure, echo=FALSE}
+# Load the necessary libraries
+library(readr)
+library(dplyr)
+library(tidyverse)
+
+# Exclude the unnecessary columns
+data <- data %>% select(-c("X__run_id", "X__done", "Repetitions", "avg_disk_io", "monsoon_run_time.s."))
+
+# Group by Algorithm, Language, and GPT
+grouped_data <- data %>% group_by(Algorithm, Language, GPT)
+
+# Calculate the statistics
+stats <- grouped_data %>% 
+  summarise(across(everything(),
+                   list(mean = mean, sd = sd, cv = ~sd(.)/mean(.), range = ~max(.) - min(.))))
+
+# Print the statistics
+print(stats)
+```
+## Output
+
+```{r}
+# Write the data to a CSV file
+write_csv(stats, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/stats.csv")
+```
+
+```{r}
+# Create the CPU dataset
+dataset1 <- select(stats, Algorithm, Language, GPT, avg_cpu_mean, avg_cpu_sd, avg_cpu_cv, avg_cpu_range)
+
+# Create the Memory dataset
+dataset2 <- select(stats, Algorithm, Language, GPT, avg_mem_mean, avg_mem_sd, avg_mem_cv, avg_mem_range)
+
+# Create the Run Time dataset
+dataset3 <- select(stats, Algorithm, Language, GPT, run_time.s._mean, run_time.s._sd, run_time.s._cv, run_time.s._range)
+
+# Create the Energy dataset
+dataset4 <- select(stats, Algorithm, Language, GPT, total_energy.J._mean, total_energy.J._sd, total_energy.J._cv, total_energy.J._range)
+
+# Create the Power dataset
+dataset5 <- select(stats, Algorithm, Language, GPT, average_power.W._mean, average_power.W._sd, average_power.W._cv, average_power.W._range)
+```
+
+```{r}
+# Round all numeric columns in a data frame to 2 decimal places
+round_df <- function(df) {
+  df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, 2) else x)
+  return(df)
+}
+
+round_df_5 <- function(df) {
+  df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, 5) else x)
+  return(df)
+}
+
+# Apply the function to all datasets
+dataset1 <- round_df_5(dataset1)
+dataset2 <- round_df_5(dataset2)
+dataset3 <- round_df_5(dataset3)
+dataset4 <- round_df_5(dataset4)
+dataset5 <- round_df_5(dataset5)
+```
+
+```{r}
+write.csv(dataset1, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/cpu.csv")
+write.csv(dataset2, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/mem.csv")
+write.csv(dataset3, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/time.csv")
+write.csv(dataset4, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/energy.csv")
+write.csv(dataset5, "~/Documents/Projects/Codes/VSCodeProjects/greenlab/experiment-runner/examples/greenlab-profiling/generated-data/power.csv")
+```
+
+## Visualizations
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Filter the data
+filtered_data <- data %>%
+  filter(Language == "js", Algorithm == "fasta")
+
+# Melt the data to long format for easier plotting
+long_data <- filtered_data %>%
+  pivot_longer(cols = c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.),
+               names_to = "Metric", values_to = "Value") %>%
+  mutate(Metric = case_when(
+    Metric == "avg_cpu" ~ "CPU (%)",
+    Metric == "avg_mem" ~ "Memory (%)",
+    Metric == "run_time.s." ~ "Time (S)",
+    Metric == "total_energy.J." ~ "Energy (J)",
+    Metric == "average_power.W." ~ "Power (W)",
+    TRUE ~ Metric
+  ))
+
+# Plot the data
+ggplot(long_data, aes(x = GPT, y = Value, fill = GPT)) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Filter the data
+filtered_data <- data %>%
+  filter(Language == "py", Algorithm == "fasta")
+
+# Melt the data to long format for easier plotting
+long_data <- filtered_data %>%
+  pivot_longer(cols = c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.),
+               names_to = "Metric", values_to = "Value") %>%
+  mutate(Metric = case_when(
+    Metric == "avg_cpu" ~ "CPU (%)",
+    Metric == "avg_mem" ~ "Memory (%)",
+    Metric == "run_time.s." ~ "Time (S)",
+    Metric == "total_energy.J." ~ "Energy (J)",
+    Metric == "average_power.W." ~ "Power (W)",
+    TRUE ~ Metric
+  ))
+
+# Plot the data
+ggplot(long_data, aes(x = GPT, y = Value, fill = GPT)) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Filter the data
+filtered_data <- data %>%
+  filter(Language == "java", Algorithm == "fasta")
+
+# Melt the data to long format for easier plotting
+long_data <- filtered_data %>%
+  pivot_longer(cols = c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.),
+               names_to = "Metric", values_to = "Value") %>%
+  mutate(Metric = case_when(
+    Metric == "avg_cpu" ~ "CPU (%)",
+    Metric == "avg_mem" ~ "Memory (%)",
+    Metric == "run_time.s." ~ "Time (S)",
+    Metric == "total_energy.J." ~ "Energy (J)",
+    Metric == "average_power.W." ~ "Power (W)",
+    TRUE ~ Metric
+  ))
+
+# Plot the data
+ggplot(long_data, aes(x = GPT, y = Value, fill = GPT)) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Filter the data
+filtered_data <- data %>%
+  filter(Language == "c", Algorithm == "fasta")
+
+# Melt the data to long format for easier plotting
+long_data <- filtered_data %>%
+  pivot_longer(cols = c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.),
+               names_to = "Metric", values_to = "Value") %>%
+  mutate(Metric = case_when(
+    Metric == "avg_cpu" ~ "CPU (%)",
+    Metric == "avg_mem" ~ "Memory (%)",
+    Metric == "run_time.s." ~ "Time (S)",
+    Metric == "total_energy.J." ~ "Energy (J)",
+    Metric == "average_power.W." ~ "Power (W)",
+    TRUE ~ Metric
+  ))
+
+# Plot the data
+ggplot(long_data, aes(x = GPT, y = Value, fill = GPT)) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+
+# Filter the data
+filtered_data <- data %>%
+  filter(Language == "cpp", Algorithm == "fasta")
+
+# Melt the data to long format for easier plotting
+long_data <- filtered_data %>%
+  pivot_longer(cols = c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.),
+               names_to = "Metric", values_to = "Value") %>%
+  mutate(Metric = case_when(
+    Metric == "avg_cpu" ~ "CPU (%)",
+    Metric == "avg_mem" ~ "Memory (%)",
+    Metric == "run_time.s." ~ "Time (S)",
+    Metric == "total_energy.J." ~ "Energy (J)",
+    Metric == "average_power.W." ~ "Power (W)",
+    TRUE ~ Metric
+  ))
+
+# Plot the data
+ggplot(long_data, aes(x = GPT, y = Value, fill = GPT)) +
+  facet_wrap(~ Metric, scales = "free_y") +
+  geom_boxplot() +
+  theme_minimal()
+```
