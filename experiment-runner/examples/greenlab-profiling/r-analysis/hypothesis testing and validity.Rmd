@@ -1,0 +1,166 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+data <- read.csv("merged_result.csv")
+head(data)
+```
+
+### Miss value detection
+```{r}
+has_missing <- any(is.na(data))
+if (has_missing) {
+  print("There are miss values in the dataset")
+} else {
+  print("There is not a miss value in the dataset")
+}
+```
+
+### check if all the executions are done
+```{r}
+if_done = any(data$X__done != "DONE")
+```
+
+### Group data
+```{r}
+data$GPT <- data$GPT == "True"
+group_GPT <- subset(data, GPT == TRUE)
+group_CLGB <- subset(data, GPT == FALSE)
+```
+
+
+### Make sure that values in the columns Algorithm and Language are the same
+```{r}
+group_GPT <- group_GPT[group_GPT$Algorithm %in% group_CLGB$Algorithm & group_GPT$Language %in% group_CLGB$Language,]
+group_CLGB <- group_CLGB[group_CLGB$Algorithm %in% group_GPT$Algorithm & group_CLGB$Language %in% group_GPT$Language,]
+```
+
+### KS test RQ1
+
+```{r}
+library(effsize)
+var(group_GPT$total_energy.J.)
+var(group_CLGB$total_energy.J.)
+```
+
+```{r}
+ks.test(group_GPT$total_energy.J.,group_CLGB$total_energy.J.)
+cliff.delta(group_GPT$total_energy.J.,group_CLGB$total_energy.J.)
+```
+### ks testt RQ2
+```{r}
+var(group_GPT$avg_cpu)
+var(group_CLGB$avg_cpu)
+ks.test(group_GPT$avg_cpu,group_CLGB$avg_cpu)
+cliff.delta(group_GPT$avg_cpu,group_CLGB$avg_cpu)
+```
+```{r}
+var(group_GPT$avg_mem)
+var(group_CLGB$avg_mem)
+ks.test(group_GPT$avg_mem,group_CLGB$avg_mem)
+cliff.delta(group_GPT$avg_mem,group_CLGB$avg_mem)
+```
+```{r}
+var(group_GPT$run_time.s.)
+var(group_CLGB$run_time.s.)
+ks.test(group_GPT$run_time.s.,group_CLGB$run_time.s.)
+cliff.delta(group_GPT$run_time.s.,group_CLGB$run_time.s.)
+```
+
+```{r}
+var(group_GPT$average_power.W.)
+var(group_CLGB$average_power.W.)
+ks.test(group_GPT$average_power.W.,group_CLGB$average_power.W.)
+cliff.delta(group_GPT$average_power.W.,group_CLGB$average_power.W.)
+```
+## Conclusion validity
+
+
+```{r}
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)    # alternatively, this also loads %>%
+```
+
+
+```{r}
+# Assuming your dataframe is named 'df'
+df <- data
+# Define a function to calculate the coefficient of variation
+cv <- function(x) sd(x) / mean(x) 
+
+# Create a new dataframe with CV for specific columns
+result <- df %>%
+  group_by(Algorithm, Language, GPT) %>%
+  summarise(across(c(avg_cpu, avg_mem, run_time.s., total_energy.J., average_power.W.), 
+                   list(mean = ~mean(.), sd = ~sd(.), cv = ~cv(.)), .names = "{col}_{fn}")) %>%
+  mutate(across(ends_with("_cv"), round, 2)) # Optional: Round the CV values to 2 decimal places
+
+# View the result
+print(result)
+
+
+```
+
+```{r}
+
+cv_stats <- result %>%
+  summarise(
+    avg_cpu_high_cv = sum(avg_cpu_cv > 0.1),
+    avg_mem_high_cv = sum(avg_mem_cv > 0.1),
+    run_time_high_cv = sum(`run_time.s._cv` > 0.1),
+    total_energy_high_cv = sum(`total_energy.J._cv` > 0.1),
+    average_power_high_cv = sum(`average_power.W._cv` > 0.1)
+  )
+
+print(sum(cv_stats$total_energy_high_cv))
+print(sum(cv_stats$average_power_high_cv))
+print(sum(cv_stats$run_time_high_cv))
+print(sum(cv_stats$avg_cpu_high_cv))
+print(sum(cv_stats$avg_mem_high_cv))
+
+
+```
+### effect size
+```{r}
+# Calculate Cohen's d effect size for each variable
+library(pwr)
+# Perform power analysis for avg_cpu
+m1 <- mean(group_GPT$avg_cpu)
+m2 <- mean(group_CLGB$avg_cpu)
+sd_pooled <- sqrt((var(group_GPT$avg_cpu) + var(group_CLGB$avg_cpu)) / 2)
+effect_size_avg_cpu <- (m1 - m2) / sd_pooled
+power_analysis_avg_cpu <- pwr.t.test(d = effect_size_avg_cpu, sig.level = 0.05, n = 750, type = "two.sample")
+print(power_analysis_avg_cpu)
+```
+```{r}
+calculate_effect_size_and_power <- function(group_1, group_2) {
+  m1 <- mean(group_1)
+  m2 <- mean(group_2)
+  sd_pooled <- sqrt((var(group_1) + var(group_2)) / 2)
+  effect_size <- (m1 - m2) / sd_pooled
+  power_analysis <- pwr.t.test(d = effect_size, sig.level = 0.05, n = 750, type = "two.sample")
+  return(data.frame(Effect_Size = effect_size, Power = power_analysis$power))
+}
+
+result_avg_cpu <- calculate_effect_size_and_power(group_GPT$avg_cpu, group_CLGB$avg_cpu)
+result_avg_mem <- calculate_effect_size_and_power(group_GPT$avg_mem, group_CLGB$avg_mem)
+result_run_time <- calculate_effect_size_and_power(group_GPT$run_time.s., group_CLGB$run_time.s.)
+result_total_energy <- calculate_effect_size_and_power(group_GPT$total_energy.J., group_CLGB$total_energy.J.)
+result_average_power <- calculate_effect_size_and_power(group_GPT$average_power.W., group_CLGB$average_power.W.)
+
+# result
+
+print(result_total_energy$Power)
+print(result_average_power$Power)
+print(result_run_time$Power)
+print(result_avg_cpu$Power)
+print(result_avg_mem$Power)
+```
+
+
