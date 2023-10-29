@@ -11,7 +11,8 @@ R code for the statistical analysis can be found [here](experiment-runner/exampl
 
 Intermediate results can be found [here](experiment-runner/examples/greenlab-profiling/generated-data).
 
-Before checking out the Green Lab Profiling, please read the following sections to install the Experiment Runner and try connecting Raspberry Pi with SSH.
+> **Note**
+> Before checking out the Green Lab Profiling, please read the following sections to install the Experiment Runner and try connecting Raspberry Pi with SSH.
 
 ## How to Install Experiment Runner
 
