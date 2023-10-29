@@ -1,19 +1,5 @@
 # GreenLab Profiling
 
-## Green Lab Profiling
-
-We have a separate README for the Green Lab Profiling project, which uses Experiment Runner as its infrastructure. You can find it [here](experiment-runner/examples/greenlab-profiling/README.md).
-
-It lists the steps to reproduce the results of _Comparative Analysis of Energy Efficiency between
-ChatGPT-Generated Codes and Handwritten Codes_.
-
-R code for the statistical analysis can be found [here](experiment-runner/examples/greenlab-profiling/r-analysis).
-
-Intermediate results can be found [here](experiment-runner/examples/greenlab-profiling/generated-data).
-
-> **Note**
-> Before checking out the Green Lab Profiling, please read the following sections to install the Experiment Runner and try connecting Raspberry Pi with SSH.
-
 ## Configurations
 
 Please add a file named `fabconfig.yaml` to `experiment-runner` folder with the following content:
