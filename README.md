@@ -7,9 +7,9 @@ We have a separate README for the Green Lab Profiling project, which uses Experi
 It lists the steps to reproduce the results of _Comparative Analysis of Energy Efficiency between
 ChatGPT-Generated Codes and Handwritten Codes_.
 
-R code for the statistical analysis can be found [here](experiment-runner/examples/green-lab-profiling/r-analysis/).
+R code for the statistical analysis can be found [here](experiment-runner/examples/greenlab-profiling/r-analysis).
 
-Intermediate results can be found [here](experiment-runner/examples/green-lab-profiling/generated-data/).
+Intermediate results can be found [here](experiment-runner/examples/greenlab-profiling/generated-data).
 
 Before checking out the Green Lab Profiling, please read the following sections to install the Experiment Runner and try connecting Raspberry Pi with SSH.
 
